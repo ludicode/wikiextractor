@@ -28,13 +28,14 @@ Extracts and cleans text from a Wikipedia Cirrus dump and stores output in a
 number of files of similar size in a given directory.
 Each file will contain several documents in the format:
 
-	<doc id="" url="" title="">
+    <doc id="" url="" title="">
         ...
-        </doc>
+    </doc>
 
 """
 
-import sys, os.path, time
+import sys
+import os.path
 import re
 import json
 import argparse
@@ -48,6 +49,7 @@ version = '1.00'
 urlbase = 'http://it.wikipedia.org/'
 
 # ----------------------------------------------------------------------
+
 
 class NextFile(object):
     """
@@ -78,19 +80,20 @@ class NextFile(object):
     def _filepath(self):
         return '%s/wiki_%02d' % (self._dirname(), self.file_index)
 
+
 class OutputSplitter(object):
     """
     File-like object, that splits output to multiple files of a given max size.
     """
 
-    def __init__(self, nextFile, max_file_size=0, compress=True):
+    def __init__(self, next_file, max_file_size=0, compress=True):
         """
-        :param nextfile: a NextFile object from which to obtain filenames
+        :param next_file: a NextFile object from which to obtain filenames
             to use.
         :param max_file_size: the maximum size of each file.
-        :para compress: whether to write data with bzip compression.
+        :param compress: whether to write data with bzip compression.
         """
-        self.nextFile = nextFile
+        self.nextFile = next_file
         self.compress = compress
         self.max_file_size = max_file_size
         self.file = self.open(self.nextFile.next())
@@ -115,7 +118,8 @@ class OutputSplitter(object):
 
 # ----------------------------------------------------------------------
 
-class Extractor(object):
+
+class Extractor:
 
     def extract(self, out):
         """
@@ -136,6 +140,7 @@ class Extractor(object):
             out.write('\n')
         out.write(footer)
 
+
 def process_dump(input_file, out_file, file_size, file_compress):
     """
     :param input_file: name of the wikipedia dump file; '-' to read from stdin
@@ -152,7 +157,7 @@ def process_dump(input_file, out_file, file_size, file_compress):
     if out_file == '-':
         output = sys.stdout
         if file_compress:
-            logging.warn("writing to stdout, so no output compression (use external tool)")
+            logging.warning("writing to stdout, so no output compression (use external tool)")
     else:
         nextFile = NextFile(out_file)
         output = OutputSplitter(nextFile, file_size, file_compress)
@@ -182,12 +187,15 @@ def process_dump(input_file, out_file, file_size, file_compress):
 
 # ----------------------------------------------------------------------
 
-# Minimum size of output files
-minFileSize = 200 * 1024
+
+
+
+minFileSize = 200 * 1024  # Minimum size of output files
+
 
 def main():
     parser = argparse.ArgumentParser(prog=os.path.basename(sys.argv[0]),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=__doc__)
     parser.add_argument("input",
                         help="Cirrus Json wiki dump file")

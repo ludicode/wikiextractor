@@ -28,14 +28,9 @@ Extracts a single page from a Wikipedia dump file.
 """
 
 import sys, os.path
-import re, random
+import re
 import argparse
-from itertools import izip
-import logging, traceback
-import urllib
-import bz2, gzip
-from htmlentitydefs import name2codepoint
-import Queue, threading, multiprocessing
+import bz2
 
 
 # Program version
@@ -45,8 +40,7 @@ version = '2.9'
 # READER
 
 tagRE = re.compile(r'(.*?)<(/?\w+)[^>]*>(?:([^<]*)(<.*?>)?)?')
-#tagRE = re.compile(r'(.*?)<(/?\w+)[^>]*>([^<]*)')
-#                    1     2            3
+
 
 def process_data(input_file, ids, templates=False):
     """
@@ -61,7 +55,7 @@ def process_data(input_file, ids, templates=False):
         opener = open
 
     input = opener(input_file)
-    print '<mediawiki>'
+    print('<mediawiki>')
 
     rang = ids.split('-')
     first = int(rang[0])
@@ -82,17 +76,16 @@ def process_data(input_file, ids, templates=False):
             continue
         tag = m.group(2)
         if tag == 'page':
-            page = []
-            page.append(line)
-            inArticle = False
+            page = [line]
+            in_article = False
         elif tag == 'id' and not curid: # other <id> are present
             curid = int(m.group(3))
             if first <= curid <= last:
                 page.append(line)
-                inArticle = True
+                in_article = True
             elif curid > last and not templates:
                 break
-            elif not inArticle and not templates:
+            elif not in_article and not templates:
                 page = []
         elif tag == 'title':
             if templates:
@@ -105,7 +98,7 @@ def process_data(input_file, ids, templates=False):
         elif tag == '/page':
             if page:
                 page.append(line)
-                print ''.join(page).encode('utf-8')
+                print(''.join(page).encode('utf-8'))
                 if not templates and curid == last:
                     break
             curid = 0
@@ -113,12 +106,13 @@ def process_data(input_file, ids, templates=False):
         elif page:
             page.append(line)
 
-    print '</mediawiki>'
+    print('</mediawiki>')
     input.close()
+
 
 def main():
     parser = argparse.ArgumentParser(prog=os.path.basename(sys.argv[0]),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=__doc__)
     parser.add_argument("input",
                         help="XML wiki dump file")
@@ -133,6 +127,7 @@ def main():
     args = parser.parse_args()
 
     process_data(args.input, args.id, args.template)
+
 
 if __name__ == '__main__':
     main()

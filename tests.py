@@ -7,25 +7,25 @@ import os.path
 import unittest
 
 from WikiExtractor import (
-    normalizeTitle, unescape, ucfirst, lcfirst, splitParts,
-    fullyQualifiedTemplateTitle, NextFile
+    normalize_title, unescape, ucfirst, lcfirst, split_parts,
+    fully_qualified_template_title, NextFile
 )
 
 
 class TestNormalizeTitle(unittest.TestCase):
 
     def test_known_namespace(self):
-        self.assertEqual(normalizeTitle("Template:  Births"), "Template:Births")
-        self.assertEqual(normalizeTitle(" template:  births_"), "Template:Births")
+        self.assertEqual(normalize_title("Template:  Births"), "Template:Births")
+        self.assertEqual(normalize_title(" template:  births_"), "Template:Births")
 
     def test_not_known_namespace(self):
-        self.assertEqual(normalizeTitle("Category:  Births"), "Category: Births")
-        self.assertEqual(normalizeTitle("_category:  births___"), "Category: Births")
+        self.assertEqual(normalize_title("Category:  Births"), "Category: Births")
+        self.assertEqual(normalize_title("_category:  births___"), "Category: Births")
 
     def test_no_namespace(self):
-        self.assertEqual(normalizeTitle("python"), "Python")
-        self.assertEqual(normalizeTitle("python 3"), "Python 3")
-        self.assertEqual(normalizeTitle("python__3"), "Python 3")
+        self.assertEqual(normalize_title("python"), "Python")
+        self.assertEqual(normalize_title("python 3"), "Python 3")
+        self.assertEqual(normalize_title("python__3"), "Python 3")
 
 
 class TestStringUtils(unittest.TestCase):
@@ -53,13 +53,13 @@ class TestStringUtils(unittest.TestCase):
 class TestSplitParts(unittest.TestCase):
 
     def test_simple(self):
-        self.assertEqual(splitParts("p=q|q=r|r=s"), ['p=q', 'q=r', 'r=s'])
+        self.assertEqual(split_parts("p=q|q=r|r=s"), ['p=q', 'q=r', 'r=s'])
 
     def test_complex(self):
-        self.assertEqual(splitParts('{{#if: {{{1}}} | {{lc:{{{1}}} | "parameter missing"}}'),
+        self.assertEqual(split_parts('{{#if: {{{1}}} | {{lc:{{{1}}} | "parameter missing"}}'),
                          ['{{#if: {{{1}}} ', ' {{lc:{{{1}}} ', ' "parameter missing"}}'])
 
-        self.assertEqual(splitParts('''{{if:|
+        self.assertEqual(split_parts('''{{if:|
       |{{#if:the president|
            |{{#if:|
                [[Category:Hatnote templates|A{{PAGENAME}}]]
@@ -77,11 +77,11 @@ class TestSplitParts(unittest.TestCase):
 class TestFullyQualifiedTemplateTitle(unittest.TestCase):
 
     def test_main_namespace(self):
-        self.assertEqual(fullyQualifiedTemplateTitle(':Python'), 'Python')
-        self.assertEqual(fullyQualifiedTemplateTitle(':python'), 'Python')
+        self.assertEqual(fully_qualified_template_title(':Python'), 'Python')
+        self.assertEqual(fully_qualified_template_title(':python'), 'Python')
 
     def test_other_namespace(self):
-        self.assertEqual(fullyQualifiedTemplateTitle('User:Orange'), 'User:Orange')
+        self.assertEqual(fully_qualified_template_title('User:Orange'), 'User:Orange')
 
 
 class TestNextFile(unittest.TestCase):
